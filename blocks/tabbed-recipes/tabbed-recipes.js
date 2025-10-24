@@ -15,13 +15,17 @@ export default async function decorate(block) {
 
   // Replace <br> with \n for proper splitting (Google Docs uses <br> for line breaks)
   let tabText = tabHtml.replace(/<br\s*\/?>/gi, '\n');
-  console.log('Processed tab text:', tabText); // Debug: After <br> replacement
+  console.log('After <br> replacement:', tabText); // Debug
+
+  // STRIP HTML TAGS (e.g., <p>, </p>) to get clean text
+  tabText = tabText.replace(/<[^>]*>/g, ''); // Simple regex to remove all tags
+  console.log('Clean tab text:', tabText); // Debug: Now plain text
 
   // Split ONLY on actual newlines
   const rawTabNames = tabText.split(/\n|\r\n/).map(name => name.trim()).filter(Boolean);
   let tabNames = rawTabNames.length > 0 ? rawTabNames : [tabText]; // Fallback: single tab if no breaks
 
-  console.log('Parsed tabs:', tabNames); // Debug: Confirm tabs
+  console.log('Parsed tabs:', tabNames); // Debug: Confirm clean tabs
 
   if (tabNames.length === 0) {
     console.warn('No tabs defined in tabbed-recipes block');
