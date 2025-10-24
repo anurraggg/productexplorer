@@ -1,193 +1,206 @@
 .tabbed-recipes {
-    background-color: #fdf8f0; /* Beige from screenshot */
-    padding: 2rem;
-    border-radius: 8px;
-    font-family: system-ui, -apple-system, sans-serif;
-  }
-  
-  .tabbed-recipes .tabs-container {
-    overflow-x: auto;
-    white-space: nowrap;
-    border-bottom: 2px solid #ff6b35; /* Orange underline */
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE/Edge */
-  }
-  
-  .tabbed-recipes .tabs-container::-webkit-scrollbar {
-    display: none; /* Chrome/Safari */
-  }
-  
-  .tabbed-recipes .tabs {
-    display: inline-flex;
-    gap: 2rem;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .tabbed-recipes .tab-button {
-    background: none;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    cursor: pointer;
-    font-size: 1rem;
-    color: #333;
-    white-space: nowrap;
-    position: relative;
-    transition: color 0.3s ease;
-  }
-  
-  .tabbed-recipes .tab-button:hover {
-    color: #ff6b35;
-  }
-  
-  .tabbed-recipes .tab-button.active::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background-color: #ff6b35;
-  }
-  
-  .tabbed-recipes .tab-content {
-    position: relative;
-  }
-  
-  .tabbed-recipes .tab-pane {
-    display: none;
-  }
-  
-  .tabbed-recipes .tab-pane.active {
-    display: block;
-  }
-  
-  .tabbed-recipes .get-cooking-header {
-    text-align: center;
-    font-size: 1.5rem;
-    color: #333;
-    margin: 1rem 0 2rem;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 0.5rem;
-  }
-  
+  background-color: #fdf8f0; /* Beige from screenshot */
+  padding: 2rem;
+  border-radius: 8px;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.tabbed-recipes .tabs-container {
+  overflow-x: auto;
+  white-space: nowrap;
+  /* Removed border-bottom since buttons are rounded */
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.tabbed-recipes .tabs-container::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+.tabbed-recipes .tabs {
+  display: inline-flex;
+  gap: 0.75rem; /* Tighter gap for button-like feel */
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tabbed-recipes .tab-button {
+  background-color: #fff; /* White bg for inactive */
+  border: 1px solid #e0e0e0; /* Subtle border */
+  border-radius: 25px; /* Rounded pill shape */
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #333;
+  white-space: nowrap;
+  position: relative;
+  transition: all 0.3s ease; /* Smooth color/bg/border changes */
+}
+
+.tabbed-recipes .tab-button:hover {
+  background-color: #f9f9f9; /* Light hover bg */
+  color: #ff6b35;
+  border-color: #ff6b35; /* Orange border on hover */
+}
+
+.tabbed-recipes .tab-button.active {
+  background-color: #ff6b35; /* Orange for active */
+  color: white;
+  border-color: #ff6b35;
+  /* No underline needed */
+}
+
+.tabbed-recipes .tab-content {
+  position: relative;
+}
+
+.tabbed-recipes .tab-pane {
+  display: none;
+}
+
+.tabbed-recipes .tab-pane.active {
+  display: block;
+  animation: fadeIn 0.3s ease-in; /* Smooth tab switch */
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.tabbed-recipes .get-cooking-header {
+  text-align: center;
+  font-size: 1.5rem;
+  color: #333;
+  margin: 1rem 0 2rem;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0.5rem;
+}
+
+.tabbed-recipes .cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
   .tabbed-recipes .cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-    max-width: 1200px;
-    margin: 0 auto;
+    grid-template-columns: repeat(3, 1fr);
   }
-  
-  @media (min-width: 768px) {
-    .tabbed-recipes .cards-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
+}
+
+@media (max-width: 767px) {
+  .tabbed-recipes .cards-grid {
+    grid-template-columns: 1fr;
   }
-  
-  @media (max-width: 767px) {
-    .tabbed-recipes .cards-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-  
-  .tabbed-recipes .card {
-    position: relative;
-    height: 300px;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    background-size: cover;
-    background-position: center;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .tabbed-recipes .card picture {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-  }
-  
-  .tabbed-recipes .card picture img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  
-  .tabbed-recipes .card-overlay {
-    position: relative;
-    z-index: 2;
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.7)); /* Darken bottom */
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 1.5rem;
-    color: white;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-  }
-  
-  .tabbed-recipes .card-title {
-    font-size: 1.25rem;
-    font-weight: bold;
-    margin-bottom: 0.25rem;
-  }
-  
-  .tabbed-recipes .card-description {
-    font-size: 0.875rem;
-    margin-bottom: 1rem;
-    opacity: 0.9;
-  }
-  
-  .tabbed-recipes .card-meta {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    font-size: 0.875rem;
-  }
-  
-  .tabbed-recipes .card-time,
-  .tabbed-recipes .card-difficulty {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-  }
-  
-  .tabbed-recipes .card-time::before {
-    content: '🕐';
-  }
-  
-  .tabbed-recipes .card-difficulty::before {
-    content: '👩‍🍳';
-  }
-  
-  .tabbed-recipes .elevate-text {
-    font-size: 0.75rem;
-    opacity: 0.8;
-    margin-bottom: 0.5rem;
-  }
-  
-  .tabbed-recipes .get-cooking-btn {
-    background-color: #ff6b35;
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 0.875rem;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-    align-self: flex-start;
-  }
-  
-  .tabbed-recipes .get-cooking-btn:hover {
-    background-color: #e55a2b;
-  }
+}
+
+.tabbed-recipes .card {
+  position: relative;
+  height: 300px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Softer, deeper shadow */
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Hover prep */
+}
+
+.tabbed-recipes .card:hover {
+  transform: translateY(-5px); /* Lift on hover */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Enhanced shadow */
+}
+
+.tabbed-recipes .card picture {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.tabbed-recipes .card picture img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tabbed-recipes .card-overlay {
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7)); /* Darken bottom */
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 1.5rem;
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.tabbed-recipes .card-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.tabbed-recipes .card-description {
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  opacity: 0.9;
+}
+
+.tabbed-recipes .card-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.tabbed-recipes .card-time,
+.tabbed-recipes .card-difficulty {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.tabbed-recipes .card-time::before {
+  content: '🕐';
+}
+
+.tabbed-recipes .card-difficulty::before {
+  content: '👩‍🍳';
+}
+
+.tabbed-recipes .elevate-text {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  margin-bottom: 0.5rem;
+}
+
+.tabbed-recipes .get-cooking-btn {
+  background-color: #ff6b35;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Button hover */
+  align-self: flex-start;
+}
+
+.tabbed-recipes .get-cooking-btn:hover {
+  background-color: #e55a2b;
+  transform: scale(1.05); /* Subtle pulse */
+}
