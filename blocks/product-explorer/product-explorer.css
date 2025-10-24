@@ -1,133 +1,75 @@
-/* product-explorer.css - Styles for tabs, cards, and slider behavior */
-.product-explorer {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-.pe-tabs-container {
+.product-explorer-tabs {
     display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    margin-bottom: 15px;
+  }
+  
+  .product-explorer-tabs button {
+    padding: 8px 16px;
+    border: none;
+    background: #eee;
+    cursor: pointer;
+    border-radius: 5px;
+    flex-shrink: 0;
+  }
+  
+  .product-explorer-tabs button.active {
+    background: #0078d4;
+    color: #fff;
+  }
+  
+  .product-explorer-cards {
+    display: flex;
+    gap: 15px;
     overflow-x: auto;
     scroll-behavior: smooth;
-    white-space: nowrap;
-    border-bottom: 2px solid #eee;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    -webkit-overflow-scrolling: touch; /* Smooth iOS scroll */
-    scrollbar-width: thin; /* Firefox */
-    scrollbar-color: #ccc transparent;
-}
-
-.pe-tabs-container::-webkit-scrollbar {
-    height: 4px;
-}
-
-.pe-tabs-container::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.pe-tabs-container::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 2px;
-}
-
-.pe-tab-btn {
-    background: none;
-    border: none;
-    padding: 12px 24px;
-    margin-right: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    color: #666;
-    white-space: nowrap;
-    transition: color 0.3s, border-bottom 0.3s;
-    border-bottom: 2px solid transparent;
-}
-
-.pe-tab-btn:hover,
-.pe-tab-btn.active {
-    color: #333;
-    border-bottom-color: #007bff;
-}
-
-.pe-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-    margin-top: 20px;
-}
-
-.pe-card {
+  }
+  
+  .product-card {
+    min-width: 200px;
+    background: #fff;
     border: 1px solid #ddd;
     border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
-    display: none; /* Hidden by default, shown via JS */
-}
-
-.pe-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.pe-card-image {
+    padding: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    flex-shrink: 0;
+  }
+  
+  .product-card img {
     width: 100%;
-    height: 200px;
-    object-fit: cover;
-}
-
-.pe-card-title {
-    font-size: 20px;
-    margin: 16px 16px 8px;
-    color: #333;
-}
-
-.pe-card-description {
-    font-size: 14px;
-    margin: 0 16px 16px;
-    color: #666;
-    line-height: 1.4;
-}
-
-.pe-cta-btn {
+    height: auto;
+    border-radius: 5px;
+  }
+  
+  .product-card h3 {
+    margin: 10px 0 5px;
+    font-size: 1.1rem;
+  }
+  
+  .product-card p {
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+  }
+  
+  .cta-btn {
     display: inline-block;
-    margin: 0 16px 16px;
-    padding: 10px 20px;
-    background: #007bff;
-    color: white;
     text-decoration: none;
-    border-radius: 4px;
-    transition: background 0.3s;
-}
-
-.pe-cta-btn:hover {
-    background: #0056b3;
-}
-
-/* Mobile Responsiveness */
-@media (max-width: 768px) {
-    .product-explorer {
-        padding: 10px;
+    background: #0078d4;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+  }
+  
+  .cta-btn:hover {
+    background: #005a9e;
+  }
+  
+  /* Mobile adjustments */
+  @media (max-width: 768px) {
+    .product-card {
+      min-width: 150px;
     }
-
-    .pe-cards-grid {
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 15px;
-    }
-
-    .pe-tab-btn {
-        padding: 10px 16px;
-        font-size: 14px;
-    }
-
-    .pe-card-image {
-        height: 160px;
-    }
-}
-
-@media (max-width: 480px) {
-    .pe-cards-grid {
-        grid-template-columns: 1fr;
-    }
-}
+  }
+  
