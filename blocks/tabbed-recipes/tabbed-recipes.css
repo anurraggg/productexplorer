@@ -82,9 +82,9 @@
 }
 
 .tabbed-recipes .tab-button.active {
-  background-color: #ff6b35; /* Orange for active */
-  color: white;
-  border-color: #ff6b35;
+  background-color: #d9001d; /* Orange for active */
+  color: #fff6e3;
+  border-color: #d9001d;
   /* No underline needed */
 }
 
