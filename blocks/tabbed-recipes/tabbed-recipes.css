@@ -1,5 +1,5 @@
 .tabbed-recipes {
-  background-color: #fdf8f0; /* Beige from screenshot */
+  background-color: #fff6e3; /* Beige from screenshot */
   padding: 2rem;
   border-radius: 8px;
   font-family: system-ui, -apple-system, sans-serif;
@@ -26,7 +26,7 @@
   top: 50%;
   left: 10px; /* Adjust for visibility */
   transform: translateY(-50%);
-  color: #ff6b35;
+  color: #d9001d;
   font-size: 1.2rem;
   opacity: 0.5;
   pointer-events: none;
@@ -60,8 +60,8 @@
 }
 
 .tabbed-recipes .tab-button {
-  background-color: #fff; /* White bg for inactive */
-  border: 1px solid #e0e0e0; /* Subtle border */
+  background-color: #fff6e3; /* White bg for inactive */
+  border: 1px solid black; /* Subtle border */
   border-radius: 25px; /* Rounded pill shape */
   padding: 0.75rem 1.5rem;
   cursor: pointer;
@@ -76,9 +76,9 @@
 }
 
 .tabbed-recipes .tab-button:hover {
-  background-color: #f9f9f9; /* Light hover bg */
-  color: #ff6b35;
-  border-color: #ff6b35; /* Orange border on hover */
+  background-color: #fff6e3; /* Light hover bg */
+  color: #d9001d;
+  border-color: #d9001d; /* Orange border on hover */
 }
 
 .tabbed-recipes .tab-button.active {
@@ -223,8 +223,8 @@
 }
 
 .tabbed-recipes .get-cooking-btn {
-  background-color: #ff6b35;
-  color: white;
+  background-color: #d9001d;
+  color: #fff6e3;
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: 20px;
@@ -236,6 +236,6 @@
 }
 
 .tabbed-recipes .get-cooking-btn:hover {
-  background-color: #e55a2b;
+  background-color: #d9001d;
   transform: scale(1.05); /* Subtle pulse */
 }
