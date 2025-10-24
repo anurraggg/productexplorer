@@ -6,11 +6,17 @@ import { createOptimizedPicture } from '../../scripts/aem.js';
  */
 export default async function decorate(block) {
   const rows = [...block.querySelectorAll(':scope > div')];
-  if (rows.length < 2) return; // Need at least tabs row + one card
+  if (rows.length < 1) return; // Need at least tabs row
 
-  // Extract tabs from first row, first cell (newline-separated)
+  // Extract tabs from first row, first cell (handles <br> as \n via textContent)
   const tabsCell = rows[0].querySelector(':scope > div:first-child');
-  const tabNames = tabsCell ? tabsCell.textContent.trim().split('\n').map(name => name.trim()).filter(Boolean) : [];
+  let tabText = tabsCell ? tabsCell.textContent.trim() : '';
+  // Normalize line breaks (handles spaces or \n from <br>)
+  const tabNames = tabText
+    .split(/\n|\r\n| /) // Split on newlines or spaces if no <br>
+    .map(name => name.trim())
+    .filter(Boolean)
+    .slice(0, 10); // Limit to reasonable number, e.g., 10 tabs
 
   if (tabNames.length === 0) {
     console.warn('No tabs defined in tabbed-recipes block');
@@ -21,6 +27,21 @@ export default async function decorate(block) {
   const cardsByTab = new Map();
   tabNames.forEach(tab => cardsByTab.set(tab, []));
 
+  // Parse first card from row 0 (tabs row) if extra columns present
+  const firstRowCols = [...rows[0].querySelectorAll(':scope > div')];
+  if (firstRowCols.length >= 6) {
+    const imageSrc = firstRowCols[1].textContent.trim();
+    const title = firstRowCols[2].textContent.trim();
+    const description = firstRowCols[3].textContent.trim();
+    const time = firstRowCols[4].textContent.trim();
+    const difficulty = firstRowCols[5].textContent.trim();
+    if (imageSrc && title && tabNames.length > 0) {
+      cardsByTab.get(tabNames[0]).push({ imageSrc, title, description, time, difficulty });
+      console.log(`Added first card "${title}" to tab "${tabNames[0]}"`);
+    }
+  }
+
+  // Parse additional cards from row 1+
   for (let i = 1; i < rows.length; i += 1) {
     const cols = [...rows[i].querySelectorAll(':scope > div')];
     if (cols.length >= 6) {
@@ -30,9 +51,9 @@ export default async function decorate(block) {
       const description = cols[3].textContent.trim();
       const time = cols[4].textContent.trim();
       const difficulty = cols[5].textContent.trim();
-
-      if (cardsByTab.has(tabName)) {
+      if (cardsByTab.has(tabName) && imageSrc && title) {
         cardsByTab.get(tabName).push({ imageSrc, title, description, time, difficulty });
+        console.log(`Added card "${title}" to tab "${tabName}"`);
       }
     }
   }
