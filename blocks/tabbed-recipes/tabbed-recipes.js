@@ -8,12 +8,16 @@ export default async function decorate(block) {
   const rows = [...block.querySelectorAll(':scope > div')];
   if (rows.length < 1) return; // Need at least tabs row
 
-  // Extract tabs from first row, first cell (SPLIT ONLY ON NEWLINES)
+  // Extract tabs from first row, first cell (HANDLE <br> TAGS FROM GOOGLE DOCS)
   const tabsCell = rows[0].querySelector(':scope > div:first-child');
-  let tabText = tabsCell ? tabsCell.textContent.trim() : '';
-  console.log('Raw tab text:', tabText); // Debug: Check what Google Docs sends
+  let tabHtml = tabsCell ? tabsCell.innerHTML.trim() : '';
+  console.log('Raw tab HTML:', tabHtml); // Debug: See <br> tags
 
-  // Split ONLY on actual newlines (from Shift+Enter); no space splitting!
+  // Replace <br> with \n for proper splitting (Google Docs uses <br> for line breaks)
+  let tabText = tabHtml.replace(/<br\s*\/?>/gi, '\n');
+  console.log('Processed tab text:', tabText); // Debug: After <br> replacement
+
+  // Split ONLY on actual newlines
   const rawTabNames = tabText.split(/\n|\r\n/).map(name => name.trim()).filter(Boolean);
   let tabNames = rawTabNames.length > 0 ? rawTabNames : [tabText]; // Fallback: single tab if no breaks
 
@@ -56,7 +60,7 @@ export default async function decorate(block) {
         cardsByTab.get(tabName).push({ imageSrc, title, description, time, difficulty });
         console.log(`Added card "${title}" to tab "${tabName}"`);
       } else if (imageSrc && title) {
-        console.warn(`Card "${title}" skipped: No matching tab "${tabName}"`);
+        console.warn(`Card "${title}" skipped: No matching tab "${tabName}" (available: ${Array.from(cardsByTab.keys()).join(', ')})`);
       }
     }
   }
@@ -113,9 +117,24 @@ export default async function decorate(block) {
     cards.forEach(cardData => {
       const card = document.createElement('div');
       card.className = 'card';
-      card.style.backgroundImage = `url(${cardData.imageSrc})`; // Fallback bg if picture fails
 
-      const picture = createOptimizedPicture(cardData.imageSrc, cardData.title, false, [{ width: '800', height: '600' }]); // Optimize for card size
+      let picture;
+      // If full URL (external like Scene7), use plain <img> to avoid optimization rewrite
+      if (cardData.imageSrc.startsWith('http')) {
+        picture = document.createElement('picture');
+        const img = document.createElement('img');
+        img.src = cardData.imageSrc;
+        img.alt = cardData.title;
+        img.loading = 'lazy';
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'cover';
+        picture.appendChild(img);
+        console.log(`Using external image: ${cardData.imageSrc}`); // Debug
+      } else {
+        // Relative path: Use optimized picture
+        picture = createOptimizedPicture(cardData.imageSrc, cardData.title, false, [{ width: '800', height: '600' }]);
+      }
       card.appendChild(picture);
 
       const overlay = document.createElement('div');
@@ -155,7 +174,7 @@ export default async function decorate(block) {
       btn.className = 'get-cooking-btn';
       btn.textContent = 'Get cooking';
       btn.addEventListener('click', () => {
-        console.log(`Start cooking ${cardData.title}!`); // Placeholder
+        console.log(`Start cooking ${cardData.title}!`);
       });
       overlay.appendChild(btn);
 
