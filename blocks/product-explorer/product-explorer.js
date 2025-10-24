@@ -2,14 +2,30 @@ document.addEventListener("DOMContentLoaded", () => {
     const block = document.querySelector(".product-explorer");
     if (!block) return;
   
-    const table = block.querySelector("table");
-    if (!table) return;
+    // Try to find table rows (normal table)
+    let rows = block.querySelectorAll("table tbody tr");
   
-    // Parse table into data array
+    // If no rows found, try div-based rows (Franklin editor might convert table)
+    if (rows.length === 0) {
+      rows = block.querySelectorAll(".franklin-table-row, .franklin-table__row, div[data-row]");
+    }
+  
+    if (rows.length === 0) {
+      console.warn("No rows found in product-explorer table!");
+      return;
+    }
+  
+    // Parse rows into data
     const data = [];
-    const rows = table.querySelectorAll("tbody tr");
     rows.forEach(row => {
-      const cells = row.querySelectorAll("td");
+      let cells = row.querySelectorAll("td");
+      // If no <td>, try divs
+      if (cells.length === 0) {
+        cells = row.querySelectorAll("div, span");
+      }
+  
+      if (cells.length < 6) return; // skip incomplete rows
+  
       data.push({
         tab: cells[0].innerText.trim(),
         image: cells[1].innerText.trim(),
@@ -31,10 +47,8 @@ document.addEventListener("DOMContentLoaded", () => {
       tabBtn.innerText = tabName;
       tabBtn.className = i === 0 ? "active" : "";
       tabBtn.addEventListener("click", () => {
-        // Remove active class from all buttons
         tabMenu.querySelectorAll("button").forEach(b => b.classList.remove("active"));
         tabBtn.classList.add("active");
-        // Filter cards
         renderCards(tabName);
       });
       tabMenu.appendChild(tabBtn);
