@@ -1,75 +1,193 @@
-.product-explorer-tabs {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    margin-bottom: 15px;
-  }
-  
-  .product-explorer-tabs button {
-    padding: 8px 16px;
-    border: none;
-    background: #eee;
-    cursor: pointer;
-    border-radius: 5px;
-    flex-shrink: 0;
-  }
-  
-  .product-explorer-tabs button.active {
-    background: #0078d4;
-    color: #fff;
-  }
-  
-  .product-explorer-cards {
-    display: flex;
-    gap: 15px;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-  }
-  
-  .product-card {
-    min-width: 200px;
-    background: #fff;
-    border: 1px solid #ddd;
+.tabbed-recipes {
+    background-color: #fdf8f0; /* Beige from screenshot */
+    padding: 2rem;
     border-radius: 8px;
-    padding: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    flex-shrink: 0;
+    font-family: system-ui, -apple-system, sans-serif;
   }
   
-  .product-card img {
-    width: 100%;
-    height: auto;
-    border-radius: 5px;
+  .tabbed-recipes .tabs-container {
+    overflow-x: auto;
+    white-space: nowrap;
+    border-bottom: 2px solid #ff6b35; /* Orange underline */
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
   }
   
-  .product-card h3 {
-    margin: 10px 0 5px;
-    font-size: 1.1rem;
+  .tabbed-recipes .tabs-container::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
   }
   
-  .product-card p {
-    font-size: 0.9rem;
-    margin-bottom: 10px;
+  .tabbed-recipes .tabs {
+    display: inline-flex;
+    gap: 2rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
   }
   
-  .cta-btn {
-    display: inline-block;
-    text-decoration: none;
-    background: #0078d4;
-    color: #fff;
-    padding: 6px 12px;
-    border-radius: 5px;
-    font-size: 0.9rem;
+  .tabbed-recipes .tab-button {
+    background: none;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #333;
+    white-space: nowrap;
+    position: relative;
+    transition: color 0.3s ease;
   }
   
-  .cta-btn:hover {
-    background: #005a9e;
+  .tabbed-recipes .tab-button:hover {
+    color: #ff6b35;
   }
   
-  /* Mobile adjustments */
-  @media (max-width: 768px) {
-    .product-card {
-      min-width: 150px;
+  .tabbed-recipes .tab-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #ff6b35;
+  }
+  
+  .tabbed-recipes .tab-content {
+    position: relative;
+  }
+  
+  .tabbed-recipes .tab-pane {
+    display: none;
+  }
+  
+  .tabbed-recipes .tab-pane.active {
+    display: block;
+  }
+  
+  .tabbed-recipes .get-cooking-header {
+    text-align: center;
+    font-size: 1.5rem;
+    color: #333;
+    margin: 1rem 0 2rem;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 0.5rem;
+  }
+  
+  .tabbed-recipes .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  @media (min-width: 768px) {
+    .tabbed-recipes .cards-grid {
+      grid-template-columns: repeat(3, 1fr);
     }
   }
   
+  @media (max-width: 767px) {
+    .tabbed-recipes .cards-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .tabbed-recipes .card {
+    position: relative;
+    height: 300px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .tabbed-recipes .card picture {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+  
+  .tabbed-recipes .card picture img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .tabbed-recipes .card-overlay {
+    position: relative;
+    z-index: 2;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.7)); /* Darken bottom */
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 1.5rem;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  }
+  
+  .tabbed-recipes .card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+  }
+  
+  .tabbed-recipes .card-description {
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+    opacity: 0.9;
+  }
+  
+  .tabbed-recipes .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .tabbed-recipes .card-time,
+  .tabbed-recipes .card-difficulty {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  
+  .tabbed-recipes .card-time::before {
+    content: '🕐';
+  }
+  
+  .tabbed-recipes .card-difficulty::before {
+    content: '👩‍🍳';
+  }
+  
+  .tabbed-recipes .elevate-text {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    margin-bottom: 0.5rem;
+  }
+  
+  .tabbed-recipes .get-cooking-btn {
+    background-color: #ff6b35;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    align-self: flex-start;
+  }
+  
+  .tabbed-recipes .get-cooking-btn:hover {
+    background-color: #e55a2b;
+  }
