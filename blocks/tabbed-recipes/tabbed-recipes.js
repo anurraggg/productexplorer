@@ -8,33 +8,34 @@ export default async function decorate(block) {
   const rows = [...block.querySelectorAll(':scope > div')];
   if (rows.length < 1) return; // Need at least tabs row
 
-  // Extract tabs from first row, first cell (handles <br> as \n via textContent)
+  // Extract tabs from first row, first cell (SPLIT ONLY ON NEWLINES)
   const tabsCell = rows[0].querySelector(':scope > div:first-child');
   let tabText = tabsCell ? tabsCell.textContent.trim() : '';
-  // Normalize line breaks (handles spaces or \n from <br>)
-  const tabNames = tabText
-    .split(/\n|\r\n| /) // Split on newlines or spaces if no <br>
-    .map(name => name.trim())
-    .filter(Boolean)
-    .slice(0, 10); // Limit to reasonable number, e.g., 10 tabs
+  console.log('Raw tab text:', tabText); // Debug: Check what Google Docs sends
+
+  // Split ONLY on actual newlines (from Shift+Enter); no space splitting!
+  const rawTabNames = tabText.split(/\n|\r\n/).map(name => name.trim()).filter(Boolean);
+  let tabNames = rawTabNames.length > 0 ? rawTabNames : [tabText]; // Fallback: single tab if no breaks
+
+  console.log('Parsed tabs:', tabNames); // Debug: Confirm tabs
 
   if (tabNames.length === 0) {
     console.warn('No tabs defined in tabbed-recipes block');
     return;
   }
 
-  // Group cards by tab
+  // Group cards by tab (exact match required)
   const cardsByTab = new Map();
   tabNames.forEach(tab => cardsByTab.set(tab, []));
 
-  // Parse first card from row 0 (tabs row) if extra columns present
+  // Parse first card from row 0 (tabs row) if extra columns present (for single-row tests)
   const firstRowCols = [...rows[0].querySelectorAll(':scope > div')];
   if (firstRowCols.length >= 6) {
-    const imageSrc = firstRowCols[1].textContent.trim();
-    const title = firstRowCols[2].textContent.trim();
-    const description = firstRowCols[3].textContent.trim();
-    const time = firstRowCols[4].textContent.trim();
-    const difficulty = firstRowCols[5].textContent.trim();
+    const imageSrc = firstRowCols[1]?.textContent.trim() || '';
+    const title = firstRowCols[2]?.textContent.trim() || '';
+    const description = firstRowCols[3]?.textContent.trim() || '';
+    const time = firstRowCols[4]?.textContent.trim() || '30 mins'; // Default if missing
+    const difficulty = firstRowCols[5]?.textContent.trim() || 'Beginner'; // Default if missing
     if (imageSrc && title && tabNames.length > 0) {
       cardsByTab.get(tabNames[0]).push({ imageSrc, title, description, time, difficulty });
       console.log(`Added first card "${title}" to tab "${tabNames[0]}"`);
@@ -45,15 +46,17 @@ export default async function decorate(block) {
   for (let i = 1; i < rows.length; i += 1) {
     const cols = [...rows[i].querySelectorAll(':scope > div')];
     if (cols.length >= 6) {
-      const tabName = cols[0].textContent.trim();
-      const imageSrc = cols[1].textContent.trim();
-      const title = cols[2].textContent.trim();
-      const description = cols[3].textContent.trim();
-      const time = cols[4].textContent.trim();
-      const difficulty = cols[5].textContent.trim();
+      const tabName = cols[0]?.textContent.trim() || '';
+      const imageSrc = cols[1]?.textContent.trim() || '';
+      const title = cols[2]?.textContent.trim() || '';
+      const description = cols[3]?.textContent.trim() || '';
+      const time = cols[4]?.textContent.trim() || '30 mins'; // Default
+      const difficulty = cols[5]?.textContent.trim() || 'Beginner'; // Default
       if (cardsByTab.has(tabName) && imageSrc && title) {
         cardsByTab.get(tabName).push({ imageSrc, title, description, time, difficulty });
         console.log(`Added card "${title}" to tab "${tabName}"`);
+      } else if (imageSrc && title) {
+        console.warn(`Card "${title}" skipped: No matching tab "${tabName}"`);
       }
     }
   }
@@ -72,7 +75,7 @@ export default async function decorate(block) {
     tabButton.className = 'tab-button';
     tabButton.textContent = tabName;
     tabButton.setAttribute('role', 'tab');
-    tabButton.setAttribute('aria-selected', index === 0);
+    tabButton.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
     tabButton.setAttribute('aria-controls', `tab-pane-${index}`);
     tabButton.setAttribute('id', `tab-${index}`);
     if (index === 0) tabButton.classList.add('active');
@@ -105,11 +108,14 @@ export default async function decorate(block) {
     grid.className = 'cards-grid';
 
     const cards = cardsByTab.get(tabName) || [];
+    console.log(`Tab "${tabName}": ${cards.length} cards`); // Debug: Check card counts
+
     cards.forEach(cardData => {
       const card = document.createElement('div');
       card.className = 'card';
+      card.style.backgroundImage = `url(${cardData.imageSrc})`; // Fallback bg if picture fails
 
-      const picture = createOptimizedPicture(cardData.imageSrc, cardData.title, false);
+      const picture = createOptimizedPicture(cardData.imageSrc, cardData.title, false, [{ width: '800', height: '600' }]); // Optimize for card size
       card.appendChild(picture);
 
       const overlay = document.createElement('div');
@@ -148,10 +154,8 @@ export default async function decorate(block) {
       const btn = document.createElement('button');
       btn.className = 'get-cooking-btn';
       btn.textContent = 'Get cooking';
-      // TODO: Add href if 7th column added
       btn.addEventListener('click', () => {
-        // Placeholder: Navigate to recipe or open modal
-        console.log(`Cooking ${cardData.title}`);
+        console.log(`Start cooking ${cardData.title}!`); // Placeholder
       });
       overlay.appendChild(btn);
 
@@ -172,14 +176,12 @@ export default async function decorate(block) {
   const tabButtons = tabsContainer.querySelectorAll('.tab-button');
   tabButtons.forEach((button, index) => {
     button.addEventListener('click', () => {
-      // Remove active from all
       tabButtons.forEach(btn => {
         btn.classList.remove('active');
         btn.setAttribute('aria-selected', 'false');
       });
       [...contentDiv.querySelectorAll('.tab-pane')].forEach(pane => pane.classList.remove('active'));
 
-      // Activate clicked
       button.classList.add('active');
       button.setAttribute('aria-selected', 'true');
       contentDiv.querySelector(`#tab-pane-${index}`).classList.add('active');
