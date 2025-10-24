@@ -13,6 +13,10 @@
   padding-bottom: 0.5rem;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE/Edge */
+  scroll-behavior: smooth; /* Smooth native scroll animation */
+  /* Subtle fade on edges to hint at hidden tabs */
+  mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
 }
 
 .tabbed-recipes .tabs-container::-webkit-scrollbar {

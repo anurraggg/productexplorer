@@ -196,20 +196,28 @@ export default async function decorate(block) {
   block.appendChild(contentDiv);
 
   // Add tab switching logic
-  const tabButtons = tabsContainer.querySelectorAll('.tab-button');
-  tabButtons.forEach((button, index) => {
-    button.addEventListener('click', () => {
-      tabButtons.forEach(btn => {
-        btn.classList.remove('active');
-        btn.setAttribute('aria-selected', 'false');
+    // Add tab switching logic
+    const tabButtons = tabsContainer.querySelectorAll('.tab-button');
+    tabButtons.forEach((button, index) => {
+      button.addEventListener('click', () => {
+        tabButtons.forEach(btn => {
+          btn.classList.remove('active');
+          btn.setAttribute('aria-selected', 'false');
+        });
+        [...contentDiv.querySelectorAll('.tab-pane')].forEach(pane => pane.classList.remove('active'));
+  
+        button.classList.add('active');
+        button.setAttribute('aria-selected', 'true');
+        contentDiv.querySelector(`#tab-pane-${index}`).classList.add('active');
+  
+        // SMOOTH SLIDE ANIMATION: Scroll active tab into center view
+        button.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'nearest', 
+          inline: 'center'  // Centers the tab horizontally
+        });
       });
-      [...contentDiv.querySelectorAll('.tab-pane')].forEach(pane => pane.classList.remove('active'));
-
-      button.classList.add('active');
-      button.setAttribute('aria-selected', 'true');
-      contentDiv.querySelector(`#tab-pane-${index}`).classList.add('active');
     });
-  });
-
-  block.dataset.blockStatus = 'loaded';
-}
+  
+    block.dataset.blockStatus = 'loaded';
+  }
