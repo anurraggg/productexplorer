@@ -14,9 +14,37 @@
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE/Edge */
   scroll-behavior: smooth; /* Smooth native scroll animation */
-  /* Subtle fade on edges to hint at hidden tabs */
-  mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+  /* REMOVED: mask-image (causing fade) */
+  position: relative; /* For arrow pseudo-elements */
+}
+
+.tabbed-recipes .tabs-container::before,
+.tabbed-recipes .tabs-container::after {
+  /* OPTIONAL: Subtle arrow hints on edges if many tabs (fade-free alternative) */
+  content: '→'; /* Right arrow on left edge, ← on right if reversed */
+  position: absolute;
+  top: 50%;
+  left: 10px; /* Adjust for visibility */
+  transform: translateY(-50%);
+  color: #ff6b35;
+  font-size: 1.2rem;
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 1;
+  /* Hide if not overflowing */
+  display: none;
+}
+
+.tabbed-recipes .tabs-container::after {
+  left: auto;
+  right: 10px;
+  content: '←';
+}
+
+.tabbed-recipes .tabs-container:has(.tabs > li:last-child:not(:last-child))::before,
+.tabbed-recipes .tabs-container:has(.tabs > li:first-child:not(:first-child))::after {
+  /* Show arrows only if overflow (pseudo-selector for :has support) */
+  display: block;
 }
 
 .tabbed-recipes .tabs-container::-webkit-scrollbar {
@@ -42,6 +70,9 @@
   white-space: nowrap;
   position: relative;
   transition: all 0.3s ease; /* Smooth color/bg/border changes */
+  /* Ensure no fade bleed */
+  -webkit-mask: none; /* Reset any inherited mask */
+  mask: none;
 }
 
 .tabbed-recipes .tab-button:hover {
