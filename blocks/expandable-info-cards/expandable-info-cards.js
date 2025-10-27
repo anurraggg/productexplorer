@@ -13,10 +13,16 @@
   for (let i = 1; i < rows.length; i += 1) {
     const cells = [...rows[i].querySelectorAll(':scope > div')];
     if (cells.length >= 4) {
-      const thumbnail = cells[0]?.textContent.trim() || ''; // Now used for img
+      let thumbnail = cells[0]?.textContent.trim() || ''; // Now validated
       const title = cells[1]?.textContent.trim() || '';
       const description = cells[2]?.textContent.trim() || '';
       const videoUrl = cells[3]?.textContent.trim() || '';
+
+      // Validate thumbnail: Must be a plausible URL (starts with / or http, ends with image ext)
+      if (thumbnail && !thumbnail.startsWith('/') && !thumbnail.startsWith('http') && !thumbnail.includes('.')) {
+        console.warn(`Invalid thumbnail URL in row ${i}: "${thumbnail}". Skipping image. Use e.g., /media/card1.jpg`);
+        thumbnail = ''; // Fallback to no image
+      }
 
       if (title && description) {
         cardsData.push({
@@ -56,9 +62,9 @@
     card.setAttribute('tabindex', '0');
     card.setAttribute('aria-expanded', index === activeIndex ? 'true' : 'false');
     card.setAttribute('aria-label', data.title);
-    card.dataset.index = index.toString();
+    card.dataset.index = index.toString(); // Ensure string for parseInt
 
-    // Thumbnail (square)
+    // Thumbnail (square, only if valid)
     if (data.thumbnail) {
       const imgWrapper = document.createElement('div');
       imgWrapper.className = 'card-thumbnail-wrapper';
@@ -99,11 +105,13 @@
 
   block.appendChild(wrapper);
 
+  // FIXED: Declare allCards BEFORE initial reorderCards call
+  const allCards = block.querySelectorAll('.exp-card');
+
   // Initial layout: Reorder DOM for left | right stack
   reorderCards(activeIndex);
 
   // Add interaction logic
-  const allCards = block.querySelectorAll('.exp-card');
   allCards.forEach((card) => {
     card.addEventListener('click', (e) => {
       // Prevent clicks on iframe
@@ -178,16 +186,20 @@
 
   function loadVideo(cardEl, videoId) {
     if (!videoId) return;
-    const videoWrapper = cardEl.querySelector('.video-wrapper');
-    videoWrapper.innerHTML = ''; // Clear placeholder
+    try {
+      const videoWrapper = cardEl.querySelector('.video-wrapper');
+      videoWrapper.innerHTML = ''; // Clear placeholder
 
-    const iframe = document.createElement('iframe');
-    iframe.src = `https://www.youtube.com/embed/${videoId}?rel=0`;
-    iframe.frameBorder = '0';
-    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-    iframe.allowFullscreen = true;
-    iframe.loading = 'lazy';
-    videoWrapper.appendChild(iframe);
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube.com/embed/${videoId}?rel=0`;
+      iframe.frameBorder = '0';
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      iframe.allowFullscreen = true;
+      iframe.loading = 'lazy';
+      videoWrapper.appendChild(iframe);
+    } catch (error) {
+      console.warn('Failed to load YouTube video:', error);
+    }
   }
 
   // Focus initial
