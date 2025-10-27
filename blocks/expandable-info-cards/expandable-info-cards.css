@@ -13,7 +13,7 @@
   margin: 0 auto;
   position: relative; /* For abs positioning during anim */
   align-items: stretch; /* Stretch to tallest child */
-  min-height: 400px; /* FIXED: Fallback min for balance */
+  min-height: 400px; /* Fallback min for balance */
 }
 
 .expandable-info-cards .exp-card {
@@ -24,16 +24,16 @@
   transition: transform 0.6s ease, opacity 0.6s ease; /* Slide/fade */
   cursor: pointer;
   flex: 1; /* Left expanded grows */
-  display: flex; /* FIXED: Flex column for header/body split */
+  display: flex; /* Flex column for header/body split */
   flex-direction: column;
 }
 
-.expandable-info-cards .exp-card.collapsed {
-  /* No max-height; flex fills via JS minHeight on wrapper */
+.expandable-info-cards .exp-card.collapsed .exp-card-body {
+  max-height: 0; /* Hide body in collapsed */
 }
 
-.expandable-info-cards .exp-card.expanded {
-  /* Full height via content */
+.expandable-info-cards .exp-card.expanded .exp-card-body {
+  max-height: none; /* Show body in expanded */
 }
 
 .expandable-info-cards .exp-card:hover:not(.expanded) {
@@ -52,7 +52,7 @@
 }
 
 .expandable-info-cards .right-stack .exp-card {
-  flex: 1; /* FIXED: Even 50-50 split */
+  flex: 1; /* Even 50-50 split */
   display: flex;
   flex-direction: column;
 }
@@ -74,10 +74,10 @@
   transform: translateY(-50px); /* Pushed down */
 }
 
-/* Header (text-only, always; flex-shrink:0 for fixed) */
+/* Header (title + desc, always; flex-shrink:0) */
 .expandable-info-cards .exp-card-header {
   padding: 1rem;
-  flex-shrink: 0; /* FIXED: Don't shrink */
+  flex-shrink: 0; /* Don't shrink */
 }
 
 .expandable-info-cards .exp-card-header h3 {
@@ -87,47 +87,49 @@
   margin: 0 0 0.5rem 0;
 }
 
-.expandable-info-cards .collapsed-desc {
+/* Single .card-desc for desc (truncate in collapsed, full in expanded) */
+.expandable-info-cards .card-desc {
   font-size: 0.875rem;
   color: #555;
   line-height: 1.4;
+  margin: 0;
+}
+
+.expandable-info-cards .card-desc.collapsed-desc {
   display: -webkit-box;
   -webkit-line-clamp: 2; /* Truncate teaser */
   -webkit-box-orient: vertical;
   overflow: hidden;
-  margin: 0;
 }
 
-/* Body (flex:1 to fill; hidden in collapsed via max-height) */
+.expandable-info-cards .card-desc.full-desc {
+  display: block; /* Full text, no truncate */
+  line-height: 1.5;
+}
+
+/* Body (flex:1 to fill; video/thumb only) */
 .expandable-info-cards .exp-card-body {
-  flex: 1; /* FIXED: Fill remaining space */
+  flex: 1; /* Fill remaining space */
   padding: 1rem;
   background: #faf9f7;
   max-height: 0;
-  overflow: hidden;
+  overflow: visible; /* FIXED: Allow overflow for full video */
   transition: max-height 0.5s ease-out;
 }
 
 .expandable-info-cards .exp-card.expanded .exp-card-body {
-  max-height: 800px; /* Taller for video + img + text */
+  max-height: none; /* Show body in expanded */
 }
 
-.expandable-info-cards .full-desc {
-  font-size: 0.875rem;
-  line-height: 1.5;
-  color: #555;
-  margin: 0 0 1rem 0;
-}
-
-/* Video (in body) */
+/* FIXED: Video wrapper for full height */
 .expandable-info-cards .video-wrapper {
   position: relative;
   width: 100%;
   height: 0;
-  padding-bottom: 56.25%; /* 16:9 */
+  padding-bottom: 56.25%; /* 16:9 aspect - FIXED: Ensure no clip */
   margin-bottom: 1rem;
   border-radius: 12px;
-  overflow: hidden;
+  overflow: visible; /* FIXED: Visible for full video */
 }
 
 .expandable-info-cards .video-wrapper iframe {
@@ -137,6 +139,7 @@
   width: 100%;
   height: 100%;
   border-radius: 12px;
+  border: none;
 }
 
 /* Thumbnail (in body, expand-only: after video) */
@@ -169,7 +172,7 @@
   }
 
   .expandable-info-cards .right-stack {
-    flex-direction: row; /* Side-by-side on small if needed, or keep column */
+    flex-direction: column; /* Keep vertical on mobile */
     max-width: none;
     height: auto;
   }
