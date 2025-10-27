@@ -1,6 +1,6 @@
 /* privacy-accordion.css */
 :where(.privacy-accordion) {
-    --accordion-bg-color: #fdf8f0;
+    --accordion-bg-color: #ffe9b5;
     --accordion-border-color: #8b4513;
     --accordion-title-color: #333;
     --accordion-arrow-color: #dc143c;
