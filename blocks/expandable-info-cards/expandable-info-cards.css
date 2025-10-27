@@ -1,114 +1,55 @@
 .expandable-info-cards {
-    background-color: #fdf8f0; /* Beige from screenshot */
-    padding: 2rem;
-    border-radius: 20px; /* Rounded like cards */
-    font-family: system-ui, -apple-system, sans-serif;
-  }
-  
-  .expandable-info-cards .cards-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3-col default */
-    gap: 1.5rem;
-    max-width: 1200px;
-    margin: 0 auto 2rem;
-  }
-  
-  @media (max-width: 768px) {
-    .expandable-info-cards .cards-grid {
-      grid-template-columns: 1fr; /* Stack on mobile */
-    }
-  }
-  
-  .expandable-info-cards .card {
-    position: relative;
-    border-radius: 20px; /* Rounded corners */
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.3s ease, transform 0.3s ease;
-    cursor: pointer;
-    background: white;
-    max-height: 200px; /* Compact initial state */
-    overflow: hidden; /* Clip expanded content */
-  }
-  
-  .expandable-info-cards .card:hover {
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-    transform: translateY(-2px);
-  }
-  
-  .expandable-info-cards .card[aria-expanded="true"] {
-    max-height: none; /* Expand on active */
-    margin-bottom: 1rem; /* Space from next */
-  }
-  
-  .expandable-info-cards .card-thumbnail {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
-    display: block;
-  }
-  
-  .expandable-info-cards .card-title {
-    padding: 1rem;
-    font-size: 1.125rem;
-    font-weight: bold;
-    color: #333;
-    margin: 0;
-    background: white;
-    border-top: 1px solid #e0e0e0;
-    transition: background 0.3s ease;
-  }
-  
-  .expandable-info-cards .card[aria-expanded="true"] .card-title {
-    background-color: #ff6b35; /* Orange on expand */
-    color: white;
-  }
-  
-  .expandable-info-cards .expanded-content {
-    max-height: 0; /* Hidden initially */
-    overflow: hidden;
-    transition: max-height 0.5s ease-out; /* Smooth expand */
-    background: #faf9f7; /* Lighter beige */
-    padding: 0 1rem;
-  }
-  
-  .expandable-info-cards .card[aria-expanded="true"] .expanded-content {
-    max-height: 600px; /* Arbitrary tall; auto in JS if needed */
-    padding: 1rem;
-  }
-  
-  .expandable-info-cards .video-embed {
-    position: relative;
-    width: 100%;
-    height: 0;
-    padding-bottom: 56.25%; /* 16:9 aspect */
-    margin-bottom: 1rem;
-  }
-  
-  .expandable-info-cards .video-embed iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 12px;
-  }
-  
-  .expandable-info-cards .description {
-    font-size: 0.875rem;
-    line-height: 1.5;
-    color: #555;
-  }
-  
-  .expandable-info-cards .description p {
-    margin-bottom: 0.75rem;
-  }
-  
-  .expandable-info-cards .description ul {
-    padding-left: 1rem;
-    margin-bottom: 0.75rem;
-  }
-  
-  .expandable-info-cards .description strong {
-    color: #ff6b35; /* Orange accents */
-  }
+  display: flex;
+  gap: 16px;
+}
+
+.exp-card {
+  flex: 1;
+  cursor: pointer;
+  padding: 16px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: flex 0.4s ease, background 0.3s ease;
+}
+
+.exp-card h3 {
+  margin: 0;
+}
+
+.exp-card .collapsed-desc {
+  font-size: 14px;
+  color: #666;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.exp-card-body {
+  display: none;
+  margin-top: 12px;
+}
+
+.exp-card.expanded {
+  flex: 3;
+  background: white;
+}
+
+.exp-card.expanded .exp-card-body {
+  display: block;
+}
+
+.video-wrapper {
+  margin-top: 12px;
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+}
+
+.video-wrapper iframe {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
