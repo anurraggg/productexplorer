@@ -1,51 +1,56 @@
-.expandable-cards {
+.expandable-info-cards {
   display: flex;
-  gap: 20px;
-  width: 100%;
-  min-height: 520px;
+  gap: 16px;
 }
 
-.card {
-  border: 1px solid #ddd;
-  overflow: hidden;
-  cursor: pointer;
-  transition: all 0.35s ease;
-  display: flex;
-  flex-direction: column;
-}
-
-.card.expanded {
-  flex: 3;
-  padding: 20px;
-}
-
-.card.collapsed {
+.exp-card {
   flex: 1;
-  max-width: 35%;
-  display: flex;
-  flex-direction: column;
-}
-
-.collapsed-container {
-  display: flex;
-  flex-direction: column;
-  width: 35%;
-  gap: 20px;
-}
-
-.collapsed .description {
+  cursor: pointer;
+  padding: 16px;
+  background: #f5f5f5;
+  border-radius: 8px;
   overflow: hidden;
+  transition: flex 0.4s ease, background 0.3s ease;
+  margin: 10px;
+}
+
+.exp-card h3 {
+  margin: 0;
+}
+
+.exp-card .collapsed-desc {
+  font-size: 14px;
+  color: #666;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.youtube-wrapper {
-  margin-top: 20px;
-  width: 100%;
+.exp-card-body {
+  display: none;
+  margin-top: 12px;
 }
 
-.youtube-wrapper iframe {
+.exp-card.expanded {
+  flex: 3;
+  background: #ffe9b5;
+}
+
+.exp-card.expanded .exp-card-body {
+  display: block;
+}
+
+.video-wrapper {
+  margin-top: 12px;
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+}
+
+.video-wrapper iframe {
+  position: absolute;
   width: 100%;
-  height: 280px;
+  height: 100%;
+  border: none;
 }
