@@ -7,11 +7,8 @@
     --accordion-arrow-size: 16px;
     --accordion-spacing: 1rem;
     background-color: var(--accordion-bg-color);
-    padding: 2rem;
-    border: 1px solid var(--accordion-border-color);
-    border-radius: 8px;
-    max-width: 800px;
-    margin: 0 auto;
+    padding: 2rem 0; /* Reduced side padding for full-width feel */
+    /* Removed: border, border-radius, max-width, margin for full-width span */
   }
   
   .privacy-accordion .main-title {
@@ -26,6 +23,7 @@
   .privacy-accordion .section {
     margin-bottom: var(--accordion-spacing);
     border-bottom: 1px solid var(--accordion-border-color);
+    padding: 0 2rem; /* Inner sections padded for readability */
   }
   
   .privacy-accordion .intro-section:last-child,
@@ -42,7 +40,7 @@
   }
   
   .privacy-accordion .intro-description {
-    padding: 0 0 var(--accordion-spacing) var(--accordion-spacing);
+    padding: 0 0 var(--accordion-spacing) 0;
   }
   
   .privacy-accordion .intro-description p {
@@ -106,8 +104,12 @@
   
   @media (max-width: 768px) {
     :where(.privacy-accordion) {
-      padding: 1rem;
-      margin: 0 1rem;
+      padding: 1rem 0;
+    }
+  
+    .privacy-accordion .intro-section,
+    .privacy-accordion .section {
+      padding: 0 1rem;
     }
   
     .privacy-accordion .title-row,
