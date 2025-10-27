@@ -4,7 +4,7 @@
  */
  export default async function decorate(block) {
   // Assumes cards are pre-built in HTML as .card elements within block
-  const cards = [...block.querySelectorAll('.card')];
+  const cards = [...block.querySelectorAll(':scope .card')];
   if (cards.length === 0) {
     console.warn('No .card elements found in expandable-info-cards block');
     return;
