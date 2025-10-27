@@ -1,114 +1,149 @@
-.expandable-info-cards {
-    background-color: #fdf8f0; /* Beige from screenshot */
-    padding: 2rem;
-    border-radius: 20px; /* Rounded like cards */
-    font-family: system-ui, -apple-system, sans-serif;
+.expandable-stories {
+  background-color: #fdf8f0; /* Beige bg from screenshot */
+  padding: 2rem;
+  border-radius: 12px;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.expandable-stories .stories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .expandable-stories .stories-grid {
+    grid-template-columns: repeat(3, 1fr); /* 3-col like screenshot */
   }
-  
-  .expandable-info-cards .cards-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3-col default */
-    gap: 1.5rem;
-    max-width: 1200px;
-    margin: 0 auto 2rem;
+}
+
+@media (max-width: 767px) {
+  .expandable-stories .stories-grid {
+    grid-template-columns: 1fr; /* Stack on mobile */
   }
-  
-  @media (max-width: 768px) {
-    .expandable-info-cards .cards-grid {
-      grid-template-columns: 1fr; /* Stack on mobile */
-    }
-  }
-  
-  .expandable-info-cards .card {
-    position: relative;
-    border-radius: 20px; /* Rounded corners */
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.3s ease, transform 0.3s ease;
-    cursor: pointer;
-    background: white;
-    max-height: 200px; /* Compact initial state */
-    overflow: hidden; /* Clip expanded content */
-  }
-  
-  .expandable-info-cards .card:hover {
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-    transform: translateY(-2px);
-  }
-  
-  .expandable-info-cards .card[aria-expanded="true"] {
-    max-height: none; /* Expand on active */
-    margin-bottom: 1rem; /* Space from next */
-  }
-  
-  .expandable-info-cards .card-thumbnail {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
-    display: block;
-  }
-  
-  .expandable-info-cards .card-title {
-    padding: 1rem;
-    font-size: 1.125rem;
-    font-weight: bold;
-    color: #333;
-    margin: 0;
-    background: white;
-    border-top: 1px solid #e0e0e0;
-    transition: background 0.3s ease;
-  }
-  
-  .expandable-info-cards .card[aria-expanded="true"] .card-title {
-    background-color: #ff6b35; /* Orange on expand */
-    color: white;
-  }
-  
-  .expandable-info-cards .expanded-content {
-    max-height: 0; /* Hidden initially */
-    overflow: hidden;
-    transition: max-height 0.5s ease-out; /* Smooth expand */
-    background: #faf9f7; /* Lighter beige */
-    padding: 0 1rem;
-  }
-  
-  .expandable-info-cards .card[aria-expanded="true"] .expanded-content {
-    max-height: 600px; /* Arbitrary tall; auto in JS if needed */
-    padding: 1rem;
-  }
-  
-  .expandable-info-cards .video-embed {
-    position: relative;
-    width: 100%;
-    height: 0;
-    padding-bottom: 56.25%; /* 16:9 aspect */
-    margin-bottom: 1rem;
-  }
-  
-  .expandable-info-cards .video-embed iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 12px;
-  }
-  
-  .expandable-info-cards .description {
-    font-size: 0.875rem;
-    line-height: 1.5;
-    color: #555;
-  }
-  
-  .expandable-info-cards .description p {
-    margin-bottom: 0.75rem;
-  }
-  
-  .expandable-info-cards .description ul {
-    padding-left: 1rem;
-    margin-bottom: 0.75rem;
-  }
-  
-  .expandable-info-cards .description strong {
-    color: #ff6b35; /* Orange accents */
-  }
+}
+
+.expandable-stories .story-card {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  background: white;
+}
+
+.expandable-stories .story-card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.expandable-stories .story-thumbnail {
+  position: relative;
+  width: 100%;
+  height: 200px; /* Fixed aspect for consistency */
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.expandable-stories .story-thumbnail::before {
+  content: '▶'; /* Play icon */
+  position: absolute;
+  font-size: 3rem;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.expandable-stories .story-card:hover .story-thumbnail::before {
+  opacity: 1;
+}
+
+.expandable-stories .story-title {
+  padding: 1rem;
+  font-size: 1.125rem;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  border-top: 1px solid #e0e0e0;
+}
+
+.expandable-stories .story-expanded {
+  max-height: 0; /* Collapsed state */
+  overflow: hidden;
+  transition: max-height 0.4s ease-out; /* Smooth expand */
+  background: #faf9f7; /* Lighter beige for content */
+}
+
+.expandable-stories .story-expanded.active {
+  max-height: 600px; /* Adjust based on content; or use JS for dynamic */
+}
+
+.expandable-stories .story-video {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-bottom: 56.25%; /* 16:9 aspect */
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.expandable-stories .story-expanded.active .story-video {
+  opacity: 1;
+}
+
+.expandable-stories .story-video iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 0 0 12px 12px; /* Match card bottom */
+}
+
+.expandable-stories .story-desc {
+  padding: 1.5rem;
+  font-size: 0.875rem;
+  color: #555;
+  line-height: 1.5;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+}
+
+.expandable-stories .story-expanded.active .story-desc {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Close button for expanded */
+.expandable-stories .close-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: rgba(255, 107, 53, 0.8); /* Semi-orange */
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.expandable-stories .story-expanded.active .close-btn {
+  opacity: 1;
+}
+
+.expandable-stories .close-btn:hover {
+  background: #ff6b35;
+}
