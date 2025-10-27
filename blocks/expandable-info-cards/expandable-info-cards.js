@@ -13,15 +13,15 @@
   for (let i = 1; i < rows.length; i += 1) {
     const cells = [...rows[i].querySelectorAll(':scope > div')];
     if (cells.length >= 4) {
-      let thumbnail = cells[0]?.textContent.trim() || ''; // Now validated
+      let thumbnail = cells[0]?.textContent.trim() || ''; // For expanded only
       const title = cells[1]?.textContent.trim() || '';
       const description = cells[2]?.textContent.trim() || '';
       const videoUrl = cells[3]?.textContent.trim() || '';
 
-      // Validate thumbnail: Must be a plausible URL (starts with / or http, ends with image ext)
+      // Validate thumbnail: Must be a plausible URL
       if (thumbnail && !thumbnail.startsWith('/') && !thumbnail.startsWith('http') && !thumbnail.includes('.')) {
         console.warn(`Invalid thumbnail URL in row ${i}: "${thumbnail}". Skipping image. Use e.g., /media/card1.jpg`);
-        thumbnail = ''; // Fallback to no image
+        thumbnail = '';
       }
 
       if (title && description) {
@@ -62,21 +62,9 @@
     card.setAttribute('tabindex', '0');
     card.setAttribute('aria-expanded', index === activeIndex ? 'true' : 'false');
     card.setAttribute('aria-label', data.title);
-    card.dataset.index = index.toString(); // Ensure string for parseInt
+    card.dataset.index = index.toString();
 
-    // Thumbnail (square, only if valid)
-    if (data.thumbnail) {
-      const imgWrapper = document.createElement('div');
-      imgWrapper.className = 'card-thumbnail-wrapper';
-      const img = document.createElement('img');
-      img.src = data.thumbnail;
-      img.alt = data.title;
-      img.loading = index < 3 ? 'eager' : 'lazy';
-      imgWrapper.appendChild(img);
-      card.appendChild(imgWrapper);
-    }
-
-    // Header
+    // Header (text-only, always visible)
     const header = document.createElement('div');
     header.className = 'exp-card-header';
     const h3 = document.createElement('h3');
@@ -88,24 +76,40 @@
     header.appendChild(collapsedDesc);
     card.appendChild(header);
 
-    // Body (expanded only)
+    // Body (expanded only: desc + video + optional thumbnail)
     const body = document.createElement('div');
     body.className = 'exp-card-body';
+
+    // Full description (text)
     const bodyDesc = document.createElement('p');
+    bodyDesc.className = 'full-desc';
     bodyDesc.textContent = data.description;
     body.appendChild(bodyDesc);
+
     // Video placeholder (loaded on expand)
     const videoPlaceholder = document.createElement('div');
     videoPlaceholder.className = 'video-wrapper';
     body.appendChild(videoPlaceholder);
-    card.appendChild(body);
 
+    // Thumbnail (only if provided, in body for expand visibility)
+    if (data.thumbnail) {
+      const imgWrapper = document.createElement('div');
+      imgWrapper.className = 'card-thumbnail-wrapper';
+      const img = document.createElement('img');
+      img.src = data.thumbnail;
+      img.alt = `${data.title} thumbnail`;
+      img.loading = 'lazy'; // Lazy since expand-only
+      imgWrapper.appendChild(img);
+      body.appendChild(imgWrapper); // Append after video
+    }
+
+    card.appendChild(body);
     wrapper.appendChild(card);
   });
 
   block.appendChild(wrapper);
 
-  // FIXED: Declare allCards BEFORE initial reorderCards call
+  // Declare allCards BEFORE initial reorderCards call
   const allCards = block.querySelectorAll('.exp-card');
 
   // Initial layout: Reorder DOM for left | right stack
@@ -156,11 +160,9 @@
       }
     });
 
-    // Reorder DOM: Active first, then others in clockwise order (e.g., next then prev)
-    const otherIndices = cardsData.map((_, i) => i).filter(i => i !== newActive);
-    // Clockwise sim: Assume order 0->1->2->0; place next after active, prev last
+    // Reorder DOM: Active first, then others in clockwise order
     const nextIdx = (newActive + 1) % 3;
-    const prevIdx = (newActive + 2) % 3; // Or otherIndices[0/1] sorted
+    const prevIdx = (newActive + 2) % 3;
     reorderCards(newActive, [nextIdx, prevIdx]);
 
     // End animation after transition
