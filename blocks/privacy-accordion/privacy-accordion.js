@@ -58,6 +58,16 @@ import {
         });
       }
     }
+  
+    // Expand the first section by default
+    const firstTitleRow = titleRows[0];
+    if (firstTitleRow) {
+      const firstDescriptionId = firstTitleRow.getAttribute('aria-controls');
+      const firstDescription = block.querySelector(`#${firstDescriptionId}`);
+      if (firstDescription) {
+        await toggleSection(firstTitleRow, firstDescription);
+      }
+    }
   }
   
   /**
@@ -120,7 +130,7 @@ import {
         if (key === 'main-title') {
           mainTitle = value;
         } else {
-          sections.push({ title: key || value.split('\n')[0], content: value });
+          sections.push({ title: cols[0].textContent.trim(), content: value });
         }
       }
     });
@@ -128,7 +138,7 @@ import {
     // Clear existing content
     block.innerHTML = '';
   
-    // Add main title if present
+    // Add main title if present (static, no dropdown)
     if (mainTitle) {
       const titleEl = document.createElement('h2');
       titleEl.classList.add('main-title');
@@ -136,13 +146,13 @@ import {
       block.appendChild(titleEl);
     }
   
-    // Build and append sections
+    // Build and append sections (collapsible)
     sections.forEach(({ title, content }) => {
       const section = buildSection(title, content);
       block.appendChild(section);
     });
   
-    // Bind interactions
+    // Bind interactions (expands first section by default)
     await bindEvents(block);
   }
   
