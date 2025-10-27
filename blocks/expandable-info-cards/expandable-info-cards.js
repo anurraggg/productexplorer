@@ -160,30 +160,49 @@
       }
     });
 
-    // Reorder DOM: Active first, then others in clockwise order
+    // Temporarily position absolute for smooth slide
+    allCards.forEach(c => {
+      c.style.position = 'absolute';
+      c.style.transition = 'transform 0.6s ease, opacity 0.6s ease';
+    });
+
+    // Reorder DOM: Active first, then others in clockwise order (for stack order)
     const nextIdx = (newActive + 1) % 3;
     const prevIdx = (newActive + 2) % 3;
     reorderCards(newActive, [nextIdx, prevIdx]);
 
-    // End animation after transition
+    // Reset positions after anim
     setTimeout(() => {
+      allCards.forEach(c => {
+        c.style.position = '';
+        c.style.transform = '';
+        c.style.opacity = '';
+      });
       block.classList.remove('reordering');
-    }, 600); // Match CSS transition duration
+    }, 600); // Match transition duration
   }
 
   function reorderCards(activeIdx, rightOrder = null) {
     const wrapper = block.querySelector('.eic-wrapper');
-    wrapper.innerHTML = ''; // Clear and rebuild order
+    const existingRightStack = wrapper.querySelector('.right-stack');
+    if (existingRightStack) existingRightStack.remove(); // Clear old stack
 
-    // Append active first
+    // Create new right-stack for vertical
+    const rightStack = document.createElement('div');
+    rightStack.className = 'right-stack';
+
+    // Append active first (left)
     const activeCard = allCards[activeIdx];
     wrapper.appendChild(activeCard);
 
-    // Append right stack in order (default: remaining in original seq)
+    // Append right stack in order (top to bottom: next, prev)
     if (!rightOrder) {
       rightOrder = cardsData.map((_, i) => i).filter(i => i !== activeIdx);
     }
-    rightOrder.forEach(idx => wrapper.appendChild(allCards[idx]));
+    rightOrder.forEach(idx => {
+      rightStack.appendChild(allCards[idx]);
+    });
+    wrapper.appendChild(rightStack);
   }
 
   function loadVideo(cardEl, videoId) {

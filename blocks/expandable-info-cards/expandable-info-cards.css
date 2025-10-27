@@ -11,6 +11,7 @@
   gap: 1.5rem;
   max-width: 1200px;
   margin: 0 auto;
+  position: relative; /* For abs positioning during anim */
 }
 
 .expandable-info-cards .exp-card {
@@ -18,7 +19,7 @@
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   background: white;
-  transition: transform 0.6s ease, opacity 0.6s ease; /* For reorder anim */
+  transition: transform 0.6s ease, opacity 0.6s ease; /* Slide/fade */
   cursor: pointer;
   flex: 1;
 }
@@ -36,35 +37,35 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
-/* Right stack: Vertical */
-.expandable-info-cards .eic-wrapper > .exp-card:nth-child(n+2) {
+/* Right stack: Vertical column */
+.expandable-info-cards .right-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
   flex: none;
-  width: auto;
-  max-width: 300px; /* Fixed for stack */
+  max-width: 300px;
 }
 
-/* Reordering animation: Clockwise rotate + slide */
+.expandable-info-cards .right-stack .exp-card {
+  flex: none;
+  width: 100%;
+}
+
+/* Animation: Slide during reordering */
 .expandable-info-cards.reordering .exp-card {
   opacity: 0.7;
 }
 
-.expandable-info-cards.reordering .exp-card {
-  animation: clockwiseRotate 0.6s ease forwards;
+.expandable-info-cards.reordering .eic-wrapper > *:first-child {
+  transform: translateX(-100px); /* Active slides left */
 }
 
-@keyframes clockwiseRotate {
-  0% {
-    transform: rotate(0deg) translateX(0);
-    opacity: 1;
-  }
-  50% {
-    transform: rotate(45deg) translateX(20px); /* Mid-rotate slide */
-    opacity: 0.5;
-  }
-  100% {
-    transform: rotate(0deg) translateX(0); /* End in new pos */
-    opacity: 1;
-  }
+.expandable-info-cards.reordering .right-stack .exp-card:first-child {
+  transform: translateX(100px); /* Old active slides right to top */
+}
+
+.expandable-info-cards.reordering .right-stack .exp-card:last-child {
+  transform: translateY(-50px); /* Pushed down */
 }
 
 /* Header (text-only, always) */
@@ -132,7 +133,7 @@
 /* Thumbnail (in body, expand-only: after video) */
 .expandable-info-cards .card-thumbnail-wrapper {
   position: relative;
-  aspect-ratio: 16 / 9; /* Wide hero for expanded; adjust if square needed */
+  aspect-ratio: 16 / 9; /* Wide hero for expanded */
   overflow: hidden;
   margin-top: 1rem;
   border-radius: 12px;
@@ -151,11 +152,12 @@
     gap: 1rem;
   }
 
-  .expandable-info-cards .exp-card {
+  .expandable-info-cards .exp-card,
+  .expandable-info-cards .right-stack .exp-card {
     max-width: 100%;
   }
 
-  .expandable-info-cards .eic-wrapper > .exp-card:nth-child(n+2) {
+  .expandable-info-cards .right-stack {
     max-width: none;
   }
 }
@@ -163,8 +165,8 @@
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .expandable-info-cards * {
-    animation: none !important;
     transition: none !important;
+    transform: none !important;
   }
 }
 
