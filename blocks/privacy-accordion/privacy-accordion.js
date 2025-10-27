@@ -58,25 +58,40 @@ import {
         });
       }
     }
-  
-    // Expand the first section by default
-    const firstTitleRow = titleRows[0];
-    if (firstTitleRow) {
-      const firstDescriptionId = firstTitleRow.getAttribute('aria-controls');
-      const firstDescription = block.querySelector(`#${firstDescriptionId}`);
-      if (firstDescription) {
-        await toggleSection(firstTitleRow, firstDescription);
-      }
-    }
+    // No default expand needed; intro is always visible, others start collapsed
   }
   
   /**
-   * Builds a single section from config.
+   * Builds the static intro section (always visible, no arrow).
+   * @param {string} title The section title.
+   * @param {string} content The description HTML.
+   * @returns {Element} The intro section element.
+   */
+  function buildIntroSection(title, content) {
+    const introSection = document.createElement('div');
+    introSection.classList.add('intro-section');
+  
+    const introTitle = document.createElement('h3');
+    introTitle.classList.add('intro-title');
+    introTitle.textContent = title;
+  
+    const introDescription = document.createElement('div');
+    introDescription.classList.add('intro-description');
+    introDescription.innerHTML = content;
+  
+    introSection.appendChild(introTitle);
+    introSection.appendChild(introDescription);
+  
+    return introSection;
+  }
+  
+  /**
+   * Builds a collapsible section.
    * @param {string} title The section title.
    * @param {string} content The description HTML.
    * @returns {Element} The section element.
    */
-  function buildSection(title, content) {
+  function buildCollapsibleSection(title, content) {
     const section = document.createElement('div');
     section.classList.add('section');
   
@@ -124,13 +139,13 @@ import {
     block.querySelectorAll(':scope > div').forEach((row) => {
       const cols = [...row.children];
       if (cols.length >= 2) {
-        const key = toClassName(cols[0].textContent.trim());
+        const key = cols[0].textContent.trim();
         const value = cols[1].innerHTML.trim() || cols[1].textContent.trim();
   
-        if (key === 'main-title') {
+        if (key.toLowerCase() === 'main-title') {
           mainTitle = value;
         } else {
-          sections.push({ title: cols[0].textContent.trim(), content: value });
+          sections.push({ title: key, content: value });
         }
       }
     });
@@ -138,7 +153,7 @@ import {
     // Clear existing content
     block.innerHTML = '';
   
-    // Add main title if present (static, no dropdown)
+    // Add main title if present (static header)
     if (mainTitle) {
       const titleEl = document.createElement('h2');
       titleEl.classList.add('main-title');
@@ -146,27 +161,19 @@ import {
       block.appendChild(titleEl);
     }
   
-    // Build and append sections (collapsible)
-    sections.forEach(({ title, content }) => {
-      const section = buildSection(title, content);
-      block.appendChild(section);
+    // Build sections: first as static intro, rest as collapsible
+    sections.forEach((sectionData, index) => {
+      if (index === 0 && sections.length > 0) {
+        // First section: always visible intro
+        const introSection = buildIntroSection(sectionData.title, sectionData.content);
+        block.appendChild(introSection);
+      } else {
+        // Subsequent sections: collapsible
+        const collapsibleSection = buildCollapsibleSection(sectionData.title, sectionData.content);
+        block.appendChild(collapsibleSection);
+      }
     });
   
-    // Bind interactions (expands first section by default)
+    // Bind interactions (only for collapsible sections)
     await bindEvents(block);
-  }
-  
-  /**
-   * Sanitizes a string for use as class name.
-   * @param {string} name The unsanitized string.
-   * @returns {string} The class name.
-   */
-  function toClassName(name) {
-    return typeof name === 'string'
-      ? name
-          .toLowerCase()
-          .replace(/[^0-9a-z]/gi, '-')
-          .replace(/-+/g, '-')
-          .replace(/^-|-$/g, '')
-      : '';
   }
