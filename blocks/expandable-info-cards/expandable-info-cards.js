@@ -53,6 +53,8 @@
   wrapper.className = 'eic-wrapper';
 
   let activeIndex = 0; // First expanded by default
+  let heightTimeout; // Debounce for sync
+  let currentObserver = null; // FIXED: Track single observer
 
   cardsData.forEach((data, index) => {
     // Create card element
@@ -111,8 +113,9 @@
   // Initial layout: Reorder DOM for left | right stack
   reorderCards(activeIndex);
 
-  // Sync heights after initial render
-  setTimeout(() => syncHeights(wrapper, allCards, activeIndex), 100);
+  // FIXED: Debounced initial sync
+  clearTimeout(heightTimeout);
+  heightTimeout = setTimeout(() => syncHeights(wrapper, allCards, activeIndex), 100);
 
   // Add interaction logic
   allCards.forEach((card) => {
@@ -139,6 +142,12 @@
   });
 
   function animateReorder(newActive) {
+    // FIXED: Disconnect previous observer
+    if (currentObserver) {
+      currentObserver.disconnect();
+      currentObserver = null;
+    }
+
     // Trigger animation class
     block.classList.add('reordering');
 
@@ -148,8 +157,6 @@
       c.classList.toggle('expanded', isActive);
       c.classList.toggle('collapsed', !isActive);
       c.setAttribute('aria-expanded', isActive ? 'true' : 'false');
-
-      // FIXED: No desc toggle needed; always full
 
       // FIXED: Toggle body display for no white space
       const body = c.querySelector('.exp-card-body');
@@ -164,6 +171,8 @@
         // Clear video if collapsing
         const videoEl = c.querySelector('.video-wrapper');
         if (videoEl) videoEl.innerHTML = '';
+        // FIXED: Reset body maxHeight on collapse
+        body.style.maxHeight = 'none';
       }
     });
 
@@ -178,6 +187,11 @@
     const prevIdx = (newActive + 2) % 3;
     reorderCards(newActive, [nextIdx, prevIdx]);
 
+    // FIXED: Reset minHeight to auto post-reorder, then debounced sync
+    wrapper.style.minHeight = 'auto';
+    const rightStack = wrapper.querySelector('.right-stack');
+    if (rightStack) rightStack.style.minHeight = 'auto';
+
     // Sync heights after anim + video load
     setTimeout(() => {
       allCards.forEach(c => {
@@ -186,14 +200,19 @@
         c.style.opacity = '';
       });
       block.classList.remove('reordering');
-      syncHeights(wrapper, allCards, newActive);
-    }, 700); // Extra delay for video/height settle
+      clearTimeout(heightTimeout);
+      heightTimeout = setTimeout(() => syncHeights(wrapper, allCards, newActive), 700); // Debounced
+    }, 600); // Match slide duration
   }
 
-  // Sync heights dynamically
+  // FIXED: Debounced sync heights with cap
   function syncHeights(wrapper, cards, activeIdx) {
     const expandedCard = cards[activeIdx];
-    const expandedHeight = expandedCard.offsetHeight || 400; // Fallback min
+    if (!expandedCard) return;
+    let expandedHeight = expandedCard.getBoundingClientRect().height || 400; // FIXED: Use getBoundingClientRect for precise
+    // FIXED: Cap to prevent creep (e.g., 80% viewport)
+    const maxCap = window.innerHeight * 0.8;
+    expandedHeight = Math.min(expandedHeight, maxCap);
     wrapper.style.minHeight = `${expandedHeight}px`;
     const rightStack = wrapper.querySelector('.right-stack');
     if (rightStack) {
@@ -240,12 +259,22 @@
       iframe.style.height = '100%';
       videoWrapper.appendChild(iframe);
 
-      // Recalc maxHeight after video loads (YT may resize)
-      iframe.addEventListener('load', () => {
-        setTimeout(() => {
-          syncHeights(wrapper, allCards, activeIndex);
-        }, 300); // Delay for YT player init
+      // FIXED: Single ResizeObserver per load (no stacking)
+      currentObserver = new ResizeObserver((entries) => {
+        for (let entry of entries) {
+          if (entry.target === iframe) {
+            clearTimeout(heightTimeout);
+            heightTimeout = setTimeout(() => syncHeights(wrapper, allCards, activeIndex), 100); // Debounced
+          }
+        }
       });
+      currentObserver.observe(iframe);
+
+      // FIXED: Post-load, set maxHeight none after transition
+      setTimeout(() => {
+        const body = cardEl.querySelector('.exp-card-body');
+        if (body) body.style.maxHeight = 'none';
+      }, 800);
     } catch (error) {
       console.warn('Failed to load YouTube video:', error);
     }

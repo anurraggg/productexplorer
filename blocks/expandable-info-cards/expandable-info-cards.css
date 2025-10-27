@@ -14,6 +14,7 @@
   position: relative; /* For abs positioning during anim */
   align-items: stretch; /* Stretch to tallest child */
   min-height: 400px; /* Fallback min for balance */
+  transition: min-height 0.3s ease; /* FIXED: Smooth height changes */
 }
 
 .expandable-info-cards .exp-card {
@@ -29,7 +30,7 @@
 }
 
 .expandable-info-cards .exp-card.collapsed .exp-card-body {
-  display: none; /* FIXED: Fully hide body in collapsed, no white space */
+  display: none; /* Hide body in collapsed, no white space */
 }
 
 .expandable-info-cards .exp-card.expanded .exp-card-body {
@@ -49,6 +50,7 @@
   flex: none;
   max-width: 300px;
   /* Height set by JS minHeight; stretch to match */
+  transition: min-height 0.3s ease; /* FIXED: Smooth */
 }
 
 .expandable-info-cards .right-stack .exp-card {
@@ -87,11 +89,11 @@
   margin: 0 0 0.5rem 0;
 }
 
-/* FIXED: .card-desc always full text, no truncate */
+/* .card-desc always full text, no truncate */
 .expandable-info-cards .card-desc {
   font-size: 0.875rem;
   color: #555;
-  line-height: 1.5; /* FIXED: Full line-height for entire desc */
+  line-height: 1.5; /* Full line-height for entire desc */
   margin: 0;
   display: block; /* Always full */
 }
