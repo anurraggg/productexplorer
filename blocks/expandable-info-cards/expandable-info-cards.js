@@ -72,7 +72,7 @@
 
     // SINGLE DESC ELEMENT
     const desc = document.createElement('p');
-    desc.className = index === activeIndex ? 'card-desc full-desc' : 'card-desc collapsed-desc';
+    desc.className = 'card-desc'; // FIXED: No collapsed/full; always full text
     desc.textContent = data.description;
 
     header.appendChild(h3);
@@ -149,21 +149,12 @@
       c.classList.toggle('collapsed', !isActive);
       c.setAttribute('aria-expanded', isActive ? 'true' : 'false');
 
-      // Toggle desc class on single element
-      const desc = c.querySelector('.card-desc');
-      if (desc) {
-        desc.classList.toggle('collapsed-desc', !isActive);
-        desc.classList.toggle('full-desc', isActive);
-      }
+      // FIXED: No desc toggle needed; always full
 
-      // FIXED: Set body maxHeight based on scrollHeight (for full video)
+      // FIXED: Toggle body display for no white space
       const body = c.querySelector('.exp-card-body');
       if (body) {
-        if (isActive) {
-          body.style.maxHeight = `${body.scrollHeight}px`;
-        } else {
-          body.style.maxHeight = '0';
-        }
+        body.style.display = isActive ? 'block' : 'none';
       }
 
       // Load video if expanding
@@ -240,7 +231,7 @@
       videoWrapper.innerHTML = ''; // Clear placeholder
 
       const iframe = document.createElement('iframe');
-      iframe.src = `https://www.youtube.com/embed/${videoId}?rel=0&enablejsapi=1&widgetid=1`; // FIXED: Add enablejsapi for better control
+      iframe.src = `https://www.youtube.com/embed/${videoId}?rel=0&enablejsapi=1&widgetid=1`;
       iframe.frameBorder = '0';
       iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
       iframe.allowFullscreen = true;
@@ -249,13 +240,9 @@
       iframe.style.height = '100%';
       videoWrapper.appendChild(iframe);
 
-      // FIXED: Recalc maxHeight after video loads (YT may resize)
+      // Recalc maxHeight after video loads (YT may resize)
       iframe.addEventListener('load', () => {
         setTimeout(() => {
-          const body = cardEl.querySelector('.exp-card-body');
-          if (body && cardEl.classList.contains('expanded')) {
-            body.style.maxHeight = `${body.scrollHeight}px`;
-          }
           syncHeights(wrapper, allCards, activeIndex);
         }, 300); // Delay for YT player init
       });

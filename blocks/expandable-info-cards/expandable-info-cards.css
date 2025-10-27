@@ -29,11 +29,11 @@
 }
 
 .expandable-info-cards .exp-card.collapsed .exp-card-body {
-  max-height: 0; /* Hide body in collapsed */
+  display: none; /* FIXED: Fully hide body in collapsed, no white space */
 }
 
 .expandable-info-cards .exp-card.expanded .exp-card-body {
-  max-height: none; /* Show body in expanded */
+  display: block; /* Show body in expanded */
 }
 
 .expandable-info-cards .exp-card:hover:not(.expanded) {
@@ -87,24 +87,13 @@
   margin: 0 0 0.5rem 0;
 }
 
-/* Single .card-desc for desc (truncate in collapsed, full in expanded) */
+/* FIXED: .card-desc always full text, no truncate */
 .expandable-info-cards .card-desc {
   font-size: 0.875rem;
   color: #555;
-  line-height: 1.4;
+  line-height: 1.5; /* FIXED: Full line-height for entire desc */
   margin: 0;
-}
-
-.expandable-info-cards .card-desc.collapsed-desc {
-  display: -webkit-box;
-  -webkit-line-clamp: 2; /* Truncate teaser */
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.expandable-info-cards .card-desc.full-desc {
-  display: block; /* Full text, no truncate */
-  line-height: 1.5;
+  display: block; /* Always full */
 }
 
 /* Body (flex:1 to fill; video/thumb only) */
@@ -112,24 +101,19 @@
   flex: 1; /* Fill remaining space */
   padding: 1rem;
   background: #faf9f7;
-  max-height: 0;
-  overflow: visible; /* FIXED: Allow overflow for full video */
-  transition: max-height 0.5s ease-out;
+  overflow: visible; /* Allow full video */
+  transition: opacity 0.3s ease; /* Subtle fade for display toggle */
 }
 
-.expandable-info-cards .exp-card.expanded .exp-card-body {
-  max-height: none; /* Show body in expanded */
-}
-
-/* FIXED: Video wrapper for full height */
+/* Video (in body) */
 .expandable-info-cards .video-wrapper {
   position: relative;
   width: 100%;
   height: 0;
-  padding-bottom: 56.25%; /* 16:9 aspect - FIXED: Ensure no clip */
+  padding-bottom: 56.25%; /* 16:9 aspect */
   margin-bottom: 1rem;
   border-radius: 12px;
-  overflow: visible; /* FIXED: Visible for full video */
+  overflow: visible;
 }
 
 .expandable-info-cards .video-wrapper iframe {
