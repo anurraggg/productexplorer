@@ -13,14 +13,14 @@
   for (let i = 1; i < rows.length; i += 1) {
     const cells = [...rows[i].querySelectorAll(':scope > div')];
     if (cells.length >= 4) {
-      const card = cells[0]?.textContent.trim() || ''; // Unused in original, kept for future
+      const thumbnail = cells[0]?.textContent.trim() || ''; // Now used for img
       const title = cells[1]?.textContent.trim() || '';
       const description = cells[2]?.textContent.trim() || '';
       const videoUrl = cells[3]?.textContent.trim() || '';
 
       if (title && description) {
         cardsData.push({
-          card,
+          thumbnail,
           title,
           description,
           video: extractYouTubeId(videoUrl),
@@ -34,17 +34,41 @@
     return;
   }
 
+  // Assume exactly 3 cards for layout; warn if not
+  if (cardsData.length !== 3) {
+    console.warn(`Expected 3 cards, got ${cardsData.length}; layout may break`);
+  }
+
   // Clear block
   block.innerHTML = '';
 
+  // Create wrapper for layout
+  const wrapper = document.createElement('div');
+  wrapper.className = 'eic-wrapper';
+
+  let activeIndex = 0; // First expanded by default
+
   cardsData.forEach((data, index) => {
     // Create card element
-    const card = document.createElement('div');
-    card.className = `exp-card ${index === 0 ? 'expanded' : ''}`;
+    const card = document.createElement('article');
+    card.className = `exp-card ${index === activeIndex ? 'expanded' : 'collapsed'}`;
     card.setAttribute('role', 'button');
     card.setAttribute('tabindex', '0');
-    card.setAttribute('aria-expanded', index === 0 ? 'true' : 'false');
+    card.setAttribute('aria-expanded', index === activeIndex ? 'true' : 'false');
     card.setAttribute('aria-label', data.title);
+    card.dataset.index = index.toString();
+
+    // Thumbnail (square)
+    if (data.thumbnail) {
+      const imgWrapper = document.createElement('div');
+      imgWrapper.className = 'card-thumbnail-wrapper';
+      const img = document.createElement('img');
+      img.src = data.thumbnail;
+      img.alt = data.title;
+      img.loading = index < 3 ? 'eager' : 'lazy';
+      imgWrapper.appendChild(img);
+      card.appendChild(imgWrapper);
+    }
 
     // Header
     const header = document.createElement('div');
@@ -58,29 +82,25 @@
     header.appendChild(collapsedDesc);
     card.appendChild(header);
 
-    // Body
+    // Body (expanded only)
     const body = document.createElement('div');
     body.className = 'exp-card-body';
     const bodyDesc = document.createElement('p');
     bodyDesc.textContent = data.description;
     body.appendChild(bodyDesc);
-
-    if (data.video) {
-      const videoWrapper = document.createElement('div');
-      videoWrapper.className = 'video-wrapper';
-      const iframe = document.createElement('iframe');
-      iframe.src = `https://www.youtube.com/embed/${data.video}?rel=0`;
-      iframe.frameBorder = '0';
-      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-      iframe.allowFullscreen = true;
-      iframe.loading = index < 3 ? 'eager' : 'lazy'; // Lazy load after first few
-      videoWrapper.appendChild(iframe);
-      body.appendChild(videoWrapper);
-    }
-
+    // Video placeholder (loaded on expand)
+    const videoPlaceholder = document.createElement('div');
+    videoPlaceholder.className = 'video-wrapper';
+    body.appendChild(videoPlaceholder);
     card.appendChild(body);
-    block.appendChild(card);
+
+    wrapper.appendChild(card);
   });
+
+  block.appendChild(wrapper);
+
+  // Initial layout: Reorder DOM for left | right stack
+  reorderCards(activeIndex);
 
   // Add interaction logic
   const allCards = block.querySelectorAll('.exp-card');
@@ -88,40 +108,90 @@
     card.addEventListener('click', (e) => {
       // Prevent clicks on iframe
       if (e.target.closest('iframe')) return;
-      toggleExpanded(card);
+      const newIndex = parseInt(card.dataset.index, 10);
+      if (newIndex !== activeIndex) {
+        activeIndex = newIndex;
+        animateReorder(activeIndex);
+      }
     });
 
     card.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        toggleExpanded(card);
+        const newIndex = parseInt(card.dataset.index, 10);
+        if (newIndex !== activeIndex) {
+          activeIndex = newIndex;
+          animateReorder(activeIndex);
+        }
       }
     });
   });
 
-  function toggleExpanded(targetCard) {
-    const isExpanded = targetCard.getAttribute('aria-expanded') === 'true';
+  function animateReorder(newActive) {
+    // Trigger animation class
+    block.classList.add('reordering');
 
-    // Close all others
-    allCards.forEach((c) => {
-      if (c !== targetCard) {
-        c.classList.remove('expanded');
-        c.setAttribute('aria-expanded', 'false');
+    // Update classes/ARIA
+    allCards.forEach((c, idx) => {
+      const isActive = idx === newActive;
+      c.classList.toggle('expanded', isActive);
+      c.classList.toggle('collapsed', !isActive);
+      c.setAttribute('aria-expanded', isActive ? 'true' : 'false');
+
+      // Load video if expanding
+      if (isActive) {
+        loadVideo(c, cardsData[newActive].video);
+      } else {
+        // Clear video if collapsing
+        const videoEl = c.querySelector('.video-wrapper');
+        if (videoEl) videoEl.innerHTML = '';
       }
     });
 
-    // Toggle target
-    if (!isExpanded) {
-      targetCard.classList.add('expanded');
-      targetCard.setAttribute('aria-expanded', 'true');
-    } else {
-      targetCard.classList.remove('expanded');
-      targetCard.setAttribute('aria-expanded', 'false');
-    }
+    // Reorder DOM: Active first, then others in clockwise order (e.g., next then prev)
+    const otherIndices = cardsData.map((_, i) => i).filter(i => i !== newActive);
+    // Clockwise sim: Assume order 0->1->2->0; place next after active, prev last
+    const nextIdx = (newActive + 1) % 3;
+    const prevIdx = (newActive + 2) % 3; // Or otherIndices[0/1] sorted
+    reorderCards(newActive, [nextIdx, prevIdx]);
 
-    // Focus management
-    targetCard.focus();
+    // End animation after transition
+    setTimeout(() => {
+      block.classList.remove('reordering');
+    }, 600); // Match CSS transition duration
   }
+
+  function reorderCards(activeIdx, rightOrder = null) {
+    const wrapper = block.querySelector('.eic-wrapper');
+    wrapper.innerHTML = ''; // Clear and rebuild order
+
+    // Append active first
+    const activeCard = allCards[activeIdx];
+    wrapper.appendChild(activeCard);
+
+    // Append right stack in order (default: remaining in original seq)
+    if (!rightOrder) {
+      rightOrder = cardsData.map((_, i) => i).filter(i => i !== activeIdx);
+    }
+    rightOrder.forEach(idx => wrapper.appendChild(allCards[idx]));
+  }
+
+  function loadVideo(cardEl, videoId) {
+    if (!videoId) return;
+    const videoWrapper = cardEl.querySelector('.video-wrapper');
+    videoWrapper.innerHTML = ''; // Clear placeholder
+
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://www.youtube.com/embed/${videoId}?rel=0`;
+    iframe.frameBorder = '0';
+    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+    iframe.allowFullscreen = true;
+    iframe.loading = 'lazy';
+    videoWrapper.appendChild(iframe);
+  }
+
+  // Focus initial
+  allCards[activeIndex].focus();
 
   block.dataset.blockStatus = 'loaded';
 }
@@ -137,6 +207,5 @@ function extractYouTubeId(url) {
   if (watchMatch) return watchMatch[1];
   const shortMatch = url.match(/youtu\.be\/([^?]+)/);
   if (shortMatch) return shortMatch[1];
-  // Assume direct ID if no match
-  return url;
+  return url; // Assume direct ID
 }
