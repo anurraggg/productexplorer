@@ -54,7 +54,7 @@
 
   let activeIndex = 0; // First expanded by default
   let heightTimeout; // Debounce for sync
-  let currentObserver = null; // FIXED: Track single observer
+  let currentObserver = null; // Track single observer
 
   cardsData.forEach((data, index) => {
     // Create card element
@@ -116,6 +116,9 @@
   // FIXED: Debounced initial sync
   clearTimeout(heightTimeout);
   heightTimeout = setTimeout(() => syncHeights(wrapper, allCards, activeIndex), 100);
+
+  // FIXED: Load initial video for expanded card on first load
+  loadVideo(allCards[activeIndex], cardsData[activeIndex].video);
 
   // Add interaction logic
   allCards.forEach((card) => {
@@ -254,7 +257,7 @@
       iframe.frameBorder = '0';
       iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
       iframe.allowFullscreen = true;
-      iframe.loading = 'lazy';
+      iframe.loading = 'eager'; // FIXED: Eager for initial load to avoid grey
       iframe.style.width = '100%';
       iframe.style.height = '100%';
       videoWrapper.appendChild(iframe);
