@@ -115,6 +115,9 @@
   // Initial layout: Reorder DOM for left | right stack
   reorderCards(activeIndex);
 
+  // FIXED: Sync heights after initial render
+  setTimeout(() => syncHeights(wrapper, allCards, activeIndex), 100);
+
   // Add interaction logic
   allCards.forEach((card) => {
     card.addEventListener('click', (e) => {
@@ -166,12 +169,12 @@
       c.style.transition = 'transform 0.6s ease, opacity 0.6s ease';
     });
 
-    // Reorder DOM: Active first, then others in clockwise order (for stack order)
+    // Reorder DOM: Active first, then others in order (for stack top: old active)
     const nextIdx = (newActive + 1) % 3;
     const prevIdx = (newActive + 2) % 3;
-    reorderCards(newActive, [nextIdx, prevIdx]);
+    reorderCards(newActive, [nextIdx, prevIdx]); // Old active as top in stack
 
-    // Reset positions after anim
+    // FIXED: Sync heights after anim + video load
     setTimeout(() => {
       allCards.forEach(c => {
         c.style.position = '';
@@ -179,7 +182,19 @@
         c.style.opacity = '';
       });
       block.classList.remove('reordering');
-    }, 600); // Match transition duration
+      syncHeights(wrapper, allCards, newActive);
+    }, 700); // Extra delay for video/height settle
+  }
+
+  // FIXED: New function to sync heights dynamically
+  function syncHeights(wrapper, cards, activeIdx) {
+    const expandedCard = cards[activeIdx];
+    const expandedHeight = expandedCard.offsetHeight || 400; // Fallback min
+    wrapper.style.minHeight = `${expandedHeight}px`;
+    const rightStack = wrapper.querySelector('.right-stack');
+    if (rightStack) {
+      rightStack.style.minHeight = `${expandedHeight}px`;
+    }
   }
 
   function reorderCards(activeIdx, rightOrder = null) {
@@ -218,6 +233,11 @@
       iframe.allowFullscreen = true;
       iframe.loading = 'lazy';
       videoWrapper.appendChild(iframe);
+
+      // FIXED: Re-sync heights after video loads (YT resize)
+      iframe.addEventListener('load', () => {
+        setTimeout(() => syncHeights(wrapper, allCards, activeIndex), 200);
+      });
     } catch (error) {
       console.warn('Failed to load YouTube video:', error);
     }

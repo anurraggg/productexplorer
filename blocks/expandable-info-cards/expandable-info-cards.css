@@ -12,8 +12,8 @@
   max-width: 1200px;
   margin: 0 auto;
   position: relative; /* For abs positioning during anim */
-  align-items: stretch; /* FIXED: Stretch children to match height */
-  height: auto; /* Let content drive height */
+  align-items: stretch; /* Stretch to tallest child */
+  min-height: 400px; /* FIXED: Fallback min for balance */
 }
 
 .expandable-info-cards .exp-card {
@@ -24,16 +24,16 @@
   transition: transform 0.6s ease, opacity 0.6s ease; /* Slide/fade */
   cursor: pointer;
   flex: 1; /* Left expanded grows */
-  display: flex;
-  flex-direction: column; /* Stack header + body vertically */
+  display: flex; /* FIXED: Flex column for header/body split */
+  flex-direction: column;
 }
 
 .expandable-info-cards .exp-card.collapsed {
-  max-height: none; /* Remove fixed; flex will handle */
+  /* No max-height; flex fills via JS minHeight on wrapper */
 }
 
 .expandable-info-cards .exp-card.expanded {
-  max-height: none; /* Full with video/text/img */
+  /* Full height via content */
 }
 
 .expandable-info-cards .exp-card:hover:not(.expanded) {
@@ -48,11 +48,11 @@
   gap: 1rem;
   flex: none;
   max-width: 300px;
-  height: 100%; /* FIXED: Match wrapper/left height */
+  /* Height set by JS minHeight; stretch to match */
 }
 
 .expandable-info-cards .right-stack .exp-card {
-  flex: 1; /* FIXED: Split 50-50 between two cards */
+  flex: 1; /* FIXED: Even 50-50 split */
   display: flex;
   flex-direction: column;
 }
@@ -74,10 +74,10 @@
   transform: translateY(-50px); /* Pushed down */
 }
 
-/* Header (text-only, always; flex-grow for fill) */
+/* Header (text-only, always; flex-shrink:0 for fixed) */
 .expandable-info-cards .exp-card-header {
   padding: 1rem;
-  flex-grow: 0; /* Fixed size */
+  flex-shrink: 0; /* FIXED: Don't shrink */
 }
 
 .expandable-info-cards .exp-card-header h3 {
@@ -98,14 +98,14 @@
   margin: 0;
 }
 
-/* Body (hidden in collapsed; flex-grow for expand fill) */
+/* Body (flex:1 to fill; hidden in collapsed via max-height) */
 .expandable-info-cards .exp-card-body {
+  flex: 1; /* FIXED: Fill remaining space */
   padding: 1rem;
   background: #faf9f7;
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.5s ease-out;
-  flex-grow: 1; /* FIXED: Fill remaining space in expanded */
 }
 
 .expandable-info-cards .exp-card.expanded .exp-card-body {
